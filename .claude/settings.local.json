@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(python -m py_compile ui_cadastro_contrato.py)",
+      "Bash(python3 -m py_compile database.py main.py styles.py ui_cadastro_cliente.py ui_cadastro_contrato.py ui_gestao_pagamentos.py ui_honorarios_dialog.py ui_relatorio.py)"
+    ]
+  }
+}
