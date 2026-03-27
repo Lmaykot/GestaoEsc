@@ -63,13 +63,16 @@ class GestaoPagamentosTab(ttk.Frame):
         tree_frame.columnconfigure(0, weight=1)
         tree_frame.rowconfigure(0, weight=1)
 
+        # Custom style for taller rows in this tree
+        style = ttk.Style()
+        style.configure('Pagamentos.Treeview', rowheight=36)
+
         self.tree = ttk.Treeview(tree_frame, columns=('info',),
-                                 show='tree headings', selectmode='browse')
-        self.tree.heading('#0', text='Contrato / Honorário', anchor='w')
-        self.tree.heading('info', text='Detalhes', anchor='w')
-        self.tree.column('#0', width=200, stretch=True)
-        self.tree.column('info', width=180, stretch=True)
-        self.tree.tag_configure('contrato', font=FONT_H3)
+                                 show='tree', selectmode='browse',
+                                 style='Pagamentos.Treeview')
+        self.tree.column('#0', width=250, stretch=True)
+        self.tree.column('info', width=200, stretch=True)
+        self.tree.tag_configure('contrato', font=FONT_H2, foreground=C_ACCENT2)
         self.tree.tag_configure('honorario', font=FONT_BODY)
         self.tree.tag_configure('odd', background=C_ROW_ODD)
         self.tree.tag_configure('even', background=C_ROW_EVEN)
