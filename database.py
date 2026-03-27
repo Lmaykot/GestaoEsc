@@ -59,10 +59,16 @@ class Database:
             );
         ''')
         self.conn.commit()
+        # Migration: add cpf_cnpj to existing databases
+        try:
+            self.conn.execute("ALTER TABLE clientes ADD COLUMN cpf_cnpj TEXT DEFAULT ''")
+            self.conn.commit()
+        except Exception:
+            pass  # Column already exists
 
     # ── Clientes ──────────────────────────────────────────────────────────────
 
-    def insert_cliente(self, nome, telefone, email, endereco, nome_repr, obs):
+    def insert_cliente(self, nome, cpf_cnpj, telefone, email, endereco, nome_repr, obs):
         cur = self.conn.execute(
             'INSERT INTO clientes (nome,telefone,email,endereco,nome_representante,observacoes) VALUES (?,?,?,?,?,?)',
             (nome, telefone, email, endereco, nome_repr, obs)
