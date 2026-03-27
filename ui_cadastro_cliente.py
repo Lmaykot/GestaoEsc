@@ -84,6 +84,7 @@ class CadastroClienteTab(ttk.Frame):
 
         fields = [
             ('nome',             'Nome do cliente *'),
+            ('cpf_cnpj',         'CPF / CNPJ'),
             ('telefone',         'Telefone'),
             ('email',            'E-mail'),
             ('endereco',         'Endereço'),
