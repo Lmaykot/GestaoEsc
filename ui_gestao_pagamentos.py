@@ -20,6 +20,7 @@ class GestaoPagamentosTab(ttk.Frame):
         self.db = db
         self.current_honorario_id = None
         self._search_after_id = None
+        self._loading = False
         self._build()
 
     # ── Build ─────────────────────────────────────────────────────────────────
