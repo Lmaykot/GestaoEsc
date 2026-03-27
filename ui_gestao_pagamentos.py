@@ -20,7 +20,7 @@ class GestaoPagamentosTab(ttk.Frame):
         self.db = db
         self.current_honorario_id = None
         self._search_after_id = None
-        self._loading = False
+        self._ignore_select = False
         self._build()
 
     # ── Build ─────────────────────────────────────────────────────────────────
@@ -139,23 +139,31 @@ class GestaoPagamentosTab(ttk.Frame):
                      width=w // 7).grid(row=0, column=col, sticky='ew')
             hdr_row.columnconfigure(col, weight=1 if col in (1, 2, 3, 4) else 0)
 
-        # Scrollable rows
-        canvas = tk.Canvas(table_outer, bg=C_WHITE, highlightthickness=0, height=260)
-        canvas.grid(row=1, column=0, sticky='nsew')
-        vsb2 = ttk.Scrollbar(table_outer, orient='vertical', command=canvas.yview)
+        # Scrollable rows — use a simple Frame inside a Canvas
+        self._parcelas_canvas = tk.Canvas(table_outer, bg=C_WHITE,
+                                          highlightthickness=0, height=260)
+        self._parcelas_canvas.grid(row=1, column=0, sticky='nsew')
+        vsb2 = ttk.Scrollbar(table_outer, orient='vertical',
+                              command=self._parcelas_canvas.yview)
         vsb2.grid(row=1, column=1, sticky='ns')
-        canvas.configure(yscrollcommand=vsb2.set)
+        self._parcelas_canvas.configure(yscrollcommand=vsb2.set)
 
-        self.parcelas_frame = tk.Frame(canvas, bg=C_WHITE)
-        win = canvas.create_window((0, 0), window=self.parcelas_frame, anchor='nw')
+        self.parcelas_frame = tk.Frame(self._parcelas_canvas, bg=C_WHITE)
+        self._parcelas_win = self._parcelas_canvas.create_window(
+            (0, 0), window=self.parcelas_frame, anchor='nw')
 
-        def _on_cf(e):
-            canvas.configure(scrollregion=canvas.bbox('all'))
-        def _on_cr(e):
-            canvas.itemconfig(win, width=e.width)
+        # Debounced Configure handlers to prevent event cascade
+        self._cfg_pending = False
 
-        self.parcelas_frame.bind('<Configure>', _on_cf)
-        canvas.bind('<Configure>', _on_cr)
+        def _schedule_scroll_update(e):
+            if not self._cfg_pending:
+                self._cfg_pending = True
+                self.after_idle(self._update_parcelas_scroll)
+
+        self.parcelas_frame.bind('<Configure>', _schedule_scroll_update)
+        self._parcelas_canvas.bind('<Configure>',
+            lambda e: self._parcelas_canvas.itemconfig(
+                self._parcelas_win, width=e.width))
 
         self.parcelas_frame.columnconfigure(0, minsize=60)
         self.parcelas_frame.columnconfigure(1, weight=1)
@@ -172,6 +180,12 @@ class GestaoPagamentosTab(ttk.Frame):
         ttk.Button(btn_row, text='Salvar Parcelas', command=self._save_parcelas).pack(side='left')
 
         self._parcela_rows = []  # list of dicts with StringVars
+
+    def _update_parcelas_scroll(self):
+        """Update canvas scrollregion once per idle cycle (prevents Configure cascade)."""
+        self._cfg_pending = False
+        self._parcelas_canvas.configure(
+            scrollregion=self._parcelas_canvas.bbox('all'))
 
     # ── Tree (hierarchical) ────────────────────────────────────────────────────
 
@@ -225,7 +239,7 @@ class GestaoPagamentosTab(ttk.Frame):
                 idx += 1
 
     def _on_tree_select(self, _event=None):
-        if self._loading:
+        if self._ignore_select:
             return
         sel = self.tree.selection()
         if not sel:
@@ -233,7 +247,8 @@ class GestaoPagamentosTab(ttk.Frame):
         iid = sel[0]
         if iid.startswith('h_'):
             hid = int(iid[2:])
-            self.load_honorario(hid)
+            # Item already selected by the click — just show details
+            self._show_honorario(hid)
         elif iid.startswith('c_'):
             # Expand/collapse contract node on click
             if self.tree.item(iid, 'open'):
@@ -244,32 +259,40 @@ class GestaoPagamentosTab(ttk.Frame):
     # ── Load honorario ────────────────────────────────────────────────────────
 
     def load_honorario(self, honorario_id):
-        self._loading = True
+        """Public API — called from report tab. Selects tree item + shows details."""
+        self._ignore_select = True
         try:
-            self.current_honorario_id = honorario_id
-            h = self.db.get_honorario(honorario_id)
-            if not h:
-                return
-            cont = self.db.get_contrato(h['contrato_id'])
-            if not cont:
-                return
-
-            self.lbl_cliente.config(text=cont['cliente_nome'])
-            self.lbl_ctt.config(text=cont['ctt_n'])
-            self.lbl_tipo.config(text=TIPO_LABEL.get(h['tipo'], h['tipo']))
-            self.lbl_hipotese.config(text=h['hipotese'] or '—')
-            self.lbl_valor.config(text=h['valor'] or '—')
-
-            # Select in tree if visible
+            iid = f'h_{honorario_id}'
+            # Open parent contract node so the honorario is visible
             try:
-                self.tree.selection_set(f'h_{honorario_id}')
-                self.tree.see(f'h_{honorario_id}')
-            except Exception:
+                parent = self.tree.parent(iid)
+                if parent:
+                    self.tree.item(parent, open=True)
+                self.tree.selection_set(iid)
+                self.tree.see(iid)
+            except tk.TclError:
                 pass
-
-            self._load_parcelas(honorario_id)
         finally:
-            self._loading = False
+            self._ignore_select = False
+        self._show_honorario(honorario_id)
+
+    def _show_honorario(self, honorario_id):
+        """Internal — display honorario details and parcelas."""
+        self.current_honorario_id = honorario_id
+        h = self.db.get_honorario(honorario_id)
+        if not h:
+            return
+        cont = self.db.get_contrato(h['contrato_id'])
+        if not cont:
+            return
+
+        self.lbl_cliente.config(text=cont['cliente_nome'])
+        self.lbl_ctt.config(text=cont['ctt_n'])
+        self.lbl_tipo.config(text=TIPO_LABEL.get(h['tipo'], h['tipo']))
+        self.lbl_hipotese.config(text=h['hipotese'] or '—')
+        self.lbl_valor.config(text=h['valor'] or '—')
+
+        self._load_parcelas(honorario_id)
 
     def _load_parcelas(self, honorario_id):
         # Clear existing rows
