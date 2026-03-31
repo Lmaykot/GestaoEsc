@@ -36,6 +36,10 @@ class GestaoEscApp(tk.Tk):
 
         apply_styles(self)
 
+        # Ensure contracts PDF directory exists
+        contratos_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'contratos')
+        os.makedirs(contratos_dir, exist_ok=True)
+
         self.db = Database()
         self._build()
 
