@@ -1,17 +1,17 @@
 import styles from './SectionHeader.module.css'
 
 interface SectionHeaderProps {
-  title: string
   icon?: string
-  className?: string
+  text: string
+  showLine?: boolean
 }
 
-export function SectionHeader({ title, icon, className = '' }: SectionHeaderProps) {
+export function SectionHeader({ icon, text, showLine = true }: SectionHeaderProps) {
   return (
-    <div className={`${styles.header} ${className}`}>
+    <div className={styles.header}>
       {icon && <span className={styles.icon}>{icon}</span>}
-      <h3 className={styles.title}>{title}</h3>
-      <div className={styles.line} />
+      <span className={styles.text}>{text}</span>
+      {showLine && <div className={styles.line} />}
     </div>
   )
 }
