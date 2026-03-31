@@ -1,0 +1,159 @@
+.page {
+  display: grid;
+  grid-template-columns: 340px 1fr;
+  gap: var(--space-6);
+  height: calc(100vh - 6rem);
+}
+
+.listPanel {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.searchFields {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.listScroll {
+  flex: 1;
+  overflow-y: auto;
+  border-radius: var(--radius-xl);
+}
+
+.detailPanel {
+  overflow-y: auto;
+}
+
+.reportHeader {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  margin-bottom: var(--space-6);
+  padding-bottom: var(--space-4);
+  border-bottom: 1px solid var(--color-outline-variant);
+}
+
+.reportClientName {
+  font-family: var(--font-heading);
+  font-size: var(--text-xl);
+  font-weight: 700;
+  color: var(--color-on-surface);
+}
+
+.reportCttN {
+  font-size: var(--text-sm);
+  color: var(--color-on-surface-muted);
+  font-weight: 500;
+}
+
+.reportMeta {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: var(--space-4);
+  margin-bottom: var(--space-6);
+}
+
+.metaLabel {
+  font-size: var(--text-xs);
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  color: var(--color-on-surface-muted);
+  margin-bottom: var(--space-1);
+}
+
+.metaValue {
+  font-size: var(--text-sm);
+  color: var(--color-on-surface);
+}
+
+.honorarioSection {
+  margin-bottom: var(--space-6);
+}
+
+.honorarioTable {
+  width: 100%;
+  border-spacing: 0;
+}
+
+.honorarioTable thead th {
+  font-size: var(--text-xs);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--color-primary);
+  text-align: left;
+  padding: var(--space-2) var(--space-4);
+  background: var(--color-surface-container);
+  border-bottom: 1px solid var(--color-outline-variant);
+}
+
+.honorarioTable thead th:first-child {
+  border-radius: var(--radius-md) 0 0 0;
+}
+.honorarioTable thead th:last-child {
+  border-radius: 0 var(--radius-md) 0 0;
+}
+
+.honorarioTable tbody td {
+  padding: var(--space-3) var(--space-4);
+  font-size: var(--text-sm);
+  border-bottom: 1px solid var(--color-outline-variant);
+}
+
+.honorarioTable tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.gerirLink {
+  color: var(--color-primary);
+  font-weight: 500;
+  cursor: pointer;
+  font-size: var(--text-sm);
+}
+.gerirLink:hover {
+  text-decoration: underline;
+}
+
+.quitacao {
+  font-weight: 500;
+  font-size: var(--text-xs);
+  padding: var(--space-1) var(--space-3);
+  border-radius: var(--radius-full);
+  display: inline-block;
+}
+
+.quitacaoPendente {
+  background: var(--color-status-pendente-bg);
+  color: var(--color-status-pendente-fg);
+}
+
+.quitacaoQuitado {
+  background: var(--color-status-ativo-bg);
+  color: var(--color-status-ativo-fg);
+}
+
+.quitacaoParcial {
+  background: var(--color-status-quitado-bg);
+  color: var(--color-status-quitado-fg);
+}
+
+.pageTitle {
+  font-family: var(--font-heading);
+  font-size: var(--text-2xl);
+  font-weight: 700;
+  color: var(--color-on-surface);
+  margin-bottom: var(--space-6);
+}
+
+.emptyDetail {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 300px;
+  color: var(--color-on-surface-muted);
+  font-size: var(--text-sm);
+}
