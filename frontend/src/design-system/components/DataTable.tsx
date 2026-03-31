@@ -1,7 +1,7 @@
 import { ReactNode } from 'react'
 import styles from './DataTable.module.css'
 
-interface Column<T> {
+export interface Column<T> {
   key: string
   header: string
   render?: (row: T) => ReactNode
@@ -11,24 +11,22 @@ interface Column<T> {
 interface DataTableProps<T> {
   columns: Column<T>[]
   data: T[]
+  rowKey: (row: T) => string | number
+  selectedKey?: string | number | null
   onRowClick?: (row: T) => void
-  selectedId?: number | null
-  idKey?: string
   emptyMessage?: string
-  className?: string
 }
 
-export function DataTable<T extends Record<string, unknown>>({
+export function DataTable<T>({
   columns,
   data,
+  rowKey,
+  selectedKey,
   onRowClick,
-  selectedId,
-  idKey = 'id',
   emptyMessage = 'Nenhum registro encontrado',
-  className = '',
 }: DataTableProps<T>) {
   return (
-    <div className={`${styles.wrapper} ${className}`}>
+    <div className={styles.wrapper}>
       <table className={styles.table}>
         <thead>
           <tr>
@@ -47,22 +45,24 @@ export function DataTable<T extends Record<string, unknown>>({
               </td>
             </tr>
           ) : (
-            data.map((row, i) => (
-              <tr
-                key={(row[idKey] as number) ?? i}
-                className={[
-                  onRowClick ? styles.clickable : '',
-                  selectedId != null && row[idKey] === selectedId ? styles.selected : '',
-                ].filter(Boolean).join(' ')}
-                onClick={() => onRowClick?.(row)}
-              >
-                {columns.map(col => (
-                  <td key={col.key}>
-                    {col.render ? col.render(row) : String(row[col.key] ?? '')}
-                  </td>
-                ))}
-              </tr>
-            ))
+            data.map(row => {
+              const key = rowKey(row)
+              return (
+                <tr
+                  key={key}
+                  className={selectedKey === key ? styles.selected : ''}
+                  onClick={() => onRowClick?.(row)}
+                >
+                  {columns.map(col => (
+                    <td key={col.key}>
+                      {col.render
+                        ? col.render(row)
+                        : String((row as Record<string, unknown>)[col.key] ?? '')}
+                    </td>
+                  ))}
+                </tr>
+              )
+            })
           )}
         </tbody>
       </table>
