@@ -31,6 +31,7 @@
 
 .table tbody tr {
   transition: background var(--transition-fast);
+  cursor: pointer;
 }
 
 .table tbody tr:hover {
@@ -50,10 +51,6 @@
 
 .table tbody tr:last-child td {
   border-bottom: none;
-}
-
-.clickable {
-  cursor: pointer;
 }
 
 .empty {
