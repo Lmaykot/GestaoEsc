@@ -60,6 +60,14 @@ def apply_styles(root):
     style.configure('MutedCard.TLabel', background=C_WHITE, foreground=C_MUTED, font=FONT_SMALL)
     style.configure('Accent.TLabel', background=C_WHITE, foreground=C_ACCENT, font=FONT_H3)
     style.configure('CTT.TLabel', background=C_WHITE, foreground=C_ACCENT2, font=('Segoe UI', 11, 'bold'))
+    style.configure('SectionHdr.TLabel', background=C_WHITE, foreground=C_SECTION_HDR,
+                    font=('Segoe UI', 9, 'bold'))
+    style.configure('StatusAtivo.TLabel', background='#DCFCE7', foreground='#15803D',
+                    font=FONT_SMALL, padding=[6, 2])
+    style.configure('StatusEncerrado.TLabel', background='#FEE2E2', foreground='#B91C1C',
+                    font=FONT_SMALL, padding=[6, 2])
+    style.configure('StatusQuitado.TLabel', background='#DBEAFE', foreground='#1D4ED8',
+                    font=FONT_SMALL, padding=[6, 2])
 
     # Entry
     style.configure('TEntry', fieldbackground=C_WHITE, foreground=C_TEXT,
