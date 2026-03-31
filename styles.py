@@ -14,8 +14,10 @@ C_ROW_ODD  = '#F8FAFC'
 C_ROW_EVEN = '#EFF3FB'
 C_SUCCESS  = '#16A34A'
 C_WARN     = '#D97706'
-C_TAB_ACT  = '#FFFFFF'
-C_TAB_INP  = '#E2E8F0'
+C_TAB_ACT     = '#FFFFFF'
+C_TAB_INP     = '#E2E8F0'
+C_SECTION_HDR = '#1E40AF'   # título de seção (azul escuro)
+C_DIVIDER     = '#E2E8F0'   # linha separadora de seção
 
 FONT_TITLE  = ('Segoe UI', 16, 'bold')
 FONT_H2     = ('Segoe UI', 12, 'bold')
