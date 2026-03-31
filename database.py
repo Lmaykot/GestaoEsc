@@ -10,6 +10,7 @@ class Database:
         self.conn.row_factory = sqlite3.Row
         self.conn.execute("PRAGMA foreign_keys = ON")
         self._create_tables()
+        self._migrate()
 
     def _create_tables(self):
         self.conn.executescript('''
@@ -20,6 +21,12 @@ class Database:
                 telefone TEXT DEFAULT '',
                 email TEXT DEFAULT '',
                 endereco TEXT DEFAULT '',
+                cep TEXT DEFAULT '',
+                logradouro TEXT DEFAULT '',
+                numero TEXT DEFAULT '',
+                complemento TEXT DEFAULT '',
+                cidade TEXT DEFAULT '',
+                estado TEXT DEFAULT '',
                 nome_representante TEXT DEFAULT '',
                 observacoes TEXT DEFAULT '',
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
@@ -33,7 +40,19 @@ class Database:
                 tipo TEXT DEFAULT '',
                 advogado TEXT DEFAULT '',
                 observacoes TEXT DEFAULT '',
+                data_assinatura TEXT DEFAULT '',
+                status TEXT DEFAULT 'Ativo',
+                arquivo_path TEXT DEFAULT '',
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                FOREIGN KEY (cliente_id) REFERENCES clientes(id)
+            );
+
+            CREATE TABLE IF NOT EXISTS contrato_clientes (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                contrato_id INTEGER NOT NULL,
+                cliente_id INTEGER NOT NULL,
+                ordem INTEGER DEFAULT 0,
+                FOREIGN KEY (contrato_id) REFERENCES contratos(id),
                 FOREIGN KEY (cliente_id) REFERENCES clientes(id)
             );
 
@@ -59,27 +78,57 @@ class Database:
             );
         ''')
         self.conn.commit()
-        # Migration: add cpf_cnpj to existing databases
-        try:
-            self.conn.execute("ALTER TABLE clientes ADD COLUMN cpf_cnpj TEXT DEFAULT ''")
-            self.conn.commit()
-        except Exception:
-            pass  # Column already exists
+
+    def _migrate(self):
+        """Safe migrations for existing databases — each is idempotent."""
+        migrations = [
+            "ALTER TABLE clientes ADD COLUMN cpf_cnpj TEXT DEFAULT ''",
+            "ALTER TABLE clientes ADD COLUMN cep TEXT DEFAULT ''",
+            "ALTER TABLE clientes ADD COLUMN logradouro TEXT DEFAULT ''",
+            "ALTER TABLE clientes ADD COLUMN numero TEXT DEFAULT ''",
+            "ALTER TABLE clientes ADD COLUMN complemento TEXT DEFAULT ''",
+            "ALTER TABLE clientes ADD COLUMN cidade TEXT DEFAULT ''",
+            "ALTER TABLE clientes ADD COLUMN estado TEXT DEFAULT ''",
+            "ALTER TABLE contratos ADD COLUMN data_assinatura TEXT DEFAULT ''",
+            "ALTER TABLE contratos ADD COLUMN status TEXT DEFAULT 'Ativo'",
+            "ALTER TABLE contratos ADD COLUMN arquivo_path TEXT DEFAULT ''",
+        ]
+        for sql in migrations:
+            try:
+                self.conn.execute(sql)
+                self.conn.commit()
+            except Exception:
+                pass  # Column already exists
 
     # ── Clientes ──────────────────────────────────────────────────────────────
 
-    def insert_cliente(self, nome, cpf_cnpj, telefone, email, endereco, nome_repr, obs):
+    def insert_cliente(self, nome, cpf_cnpj, telefone, email,
+                       cep, logradouro, numero, complemento, cidade, estado,
+                       nome_repr, obs):
         cur = self.conn.execute(
-            'INSERT INTO clientes (nome,cpf_cnpj,telefone,email,endereco,nome_representante,observacoes) VALUES (?,?,?,?,?,?,?)',
-            (nome, cpf_cnpj, telefone, email, endereco, nome_repr, obs)
+            '''INSERT INTO clientes
+               (nome,cpf_cnpj,telefone,email,cep,logradouro,numero,complemento,cidade,estado,
+                nome_representante,observacoes)
+               VALUES (?,?,?,?,?,?,?,?,?,?,?,?)''',
+            (nome, cpf_cnpj, telefone, email,
+             cep, logradouro, numero, complemento, cidade, estado,
+             nome_repr, obs)
         )
         self.conn.commit()
         return cur.lastrowid
 
-    def update_cliente(self, cid, nome, cpf_cnpj, telefone, email, endereco, nome_repr, obs):
+    def update_cliente(self, cid, nome, cpf_cnpj, telefone, email,
+                       cep, logradouro, numero, complemento, cidade, estado,
+                       nome_repr, obs):
         self.conn.execute(
-            'UPDATE clientes SET nome=?,cpf_cnpj=?,telefone=?,email=?,endereco=?,nome_representante=?,observacoes=? WHERE id=?',
-            (nome, cpf_cnpj, telefone, email, endereco, nome_repr, obs, cid)
+            '''UPDATE clientes SET
+               nome=?,cpf_cnpj=?,telefone=?,email=?,cep=?,logradouro=?,
+               numero=?,complemento=?,cidade=?,estado=?,
+               nome_representante=?,observacoes=?
+               WHERE id=?''',
+            (nome, cpf_cnpj, telefone, email,
+             cep, logradouro, numero, complemento, cidade, estado,
+             nome_repr, obs, cid)
         )
         self.conn.commit()
 
@@ -109,13 +158,29 @@ class Database:
             num = self.conn.execute('SELECT COUNT(*) FROM contratos').fetchone()[0] + 1
         return f'CTT-N-{num:03d}'
 
-    def insert_contrato(self, cliente_id, ctt_n, descricao, tipo, advogado, obs):
+    def insert_contrato(self, cliente_id, ctt_n, descricao, tipo, advogado, obs,
+                        data_assinatura='', status='Ativo', arquivo_path=''):
         cur = self.conn.execute(
-            'INSERT INTO contratos (cliente_id,ctt_n,descricao,tipo,advogado,observacoes) VALUES (?,?,?,?,?,?)',
-            (cliente_id, ctt_n, descricao, tipo, advogado, obs)
+            '''INSERT INTO contratos
+               (cliente_id,ctt_n,descricao,tipo,advogado,observacoes,data_assinatura,status,arquivo_path)
+               VALUES (?,?,?,?,?,?,?,?,?)''',
+            (cliente_id, ctt_n, descricao, tipo, advogado, obs,
+             data_assinatura, status, arquivo_path)
         )
         self.conn.commit()
         return cur.lastrowid
+
+    def update_contrato(self, cid, descricao, tipo, advogado, obs,
+                        data_assinatura='', status='Ativo', arquivo_path=''):
+        self.conn.execute(
+            '''UPDATE contratos SET
+               descricao=?,tipo=?,advogado=?,observacoes=?,
+               data_assinatura=?,status=?,arquivo_path=?
+               WHERE id=?''',
+            (descricao, tipo, advogado, obs,
+             data_assinatura, status, arquivo_path, cid)
+        )
+        self.conn.commit()
 
     def get_contrato(self, cid):
         return self.conn.execute('''
@@ -157,10 +222,34 @@ class Database:
             'SELECT * FROM contratos WHERE cliente_id=? ORDER BY ctt_n', (cliente_id,)
         ).fetchall()
 
+    # ── Contrato ↔ Clientes (múltiplos) ───────────────────────────────────────
+
+    def get_clientes_by_contrato(self, contrato_id):
+        return self.conn.execute('''
+            SELECT cl.* FROM clientes cl
+            JOIN contrato_clientes cc ON cc.cliente_id = cl.id
+            WHERE cc.contrato_id = ?
+            ORDER BY cc.ordem
+        ''', (contrato_id,)).fetchall()
+
+    def set_clientes_contrato(self, contrato_id, cliente_ids):
+        """Replace all extra clients for a contract (excludes primary already in contratos.cliente_id)."""
+        self.conn.execute('DELETE FROM contrato_clientes WHERE contrato_id=?', (contrato_id,))
+        for ordem, cid in enumerate(cliente_ids):
+            self.conn.execute(
+                'INSERT INTO contrato_clientes (contrato_id,cliente_id,ordem) VALUES (?,?,?)',
+                (contrato_id, cid, ordem)
+            )
+        self.conn.commit()
+
     # ── Honorários ────────────────────────────────────────────────────────────
 
     def replace_honorarios(self, contrato_id, rows):
-        """rows = list of (tipo, hipotese, valor, ordem)"""
+        """rows = list of (tipo, hipotese, valor, ordem).
+        Deletes parcelas first to respect FK constraint."""
+        existing = self.get_honorarios_by_contrato(contrato_id)
+        for h in existing:
+            self.conn.execute('DELETE FROM parcelas WHERE honorario_id=?', (h['id'],))
         self.conn.execute('DELETE FROM honorarios WHERE contrato_id=?', (contrato_id,))
         for r in rows:
             self.conn.execute(
