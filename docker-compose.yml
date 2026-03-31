@@ -1,0 +1,22 @@
+services:
+  api:
+    build: ./backend
+    ports:
+      - "8000:8000"
+    volumes:
+      - db-data:/app/data
+      - pdf-storage:/app/contratos
+    environment:
+      - DB_PATH=/app/data/gestao_contratos.db
+      - CONTRATOS_DIR=/app/contratos
+
+  frontend:
+    build: ./frontend
+    ports:
+      - "3000:80"
+    depends_on:
+      - api
+
+volumes:
+  db-data:
+  pdf-storage:
