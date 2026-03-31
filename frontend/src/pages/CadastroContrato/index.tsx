@@ -112,7 +112,7 @@ export function CadastroContrato() {
         })
       } else {
         const created = await contratosApi.create({
-          cliente_id: clienteId, ctt_n: form.ctt_n, ...form,
+          cliente_id: clienteId, ...form,
         })
         contratoId = created.id
         setSelectedId(created.id)
