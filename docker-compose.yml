@@ -13,6 +13,7 @@ services:
 
   frontend:
     image: ghcr.io/lmaykot/gestaoesc-frontend:latest
+    platform: linux/arm64
     ports:
       - "3000:80"
     depends_on:
