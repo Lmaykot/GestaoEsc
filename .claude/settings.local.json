@@ -8,7 +8,9 @@
       "Bash(npm run:*)",
       "Bash(pip install:*)",
       "Bash(rm -f main.py database.py styles.py ui_cadastro_cliente.py ui_cadastro_contrato.py ui_gestao_pagamentos.py ui_honorarios_dialog.py ui_relatorio.py iniciar.bat gestao_contratos.db)",
-      "Bash(rm -rf __pycache__ contratos)"
+      "Bash(rm -rf __pycache__ contratos)",
+      "Bash(gh auth:*)",
+      "Bash(gh release:*)"
     ]
   }
 }
