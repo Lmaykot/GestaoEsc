@@ -7,7 +7,7 @@ DB_PATH = os.environ.get('DB_PATH', os.path.join(os.path.dirname(os.path.abspath
 class Database:
     def __init__(self):
         os.makedirs(os.path.dirname(DB_PATH), exist_ok=True)
-        self.conn = sqlite3.connect(DB_PATH)
+        self.conn = sqlite3.connect(DB_PATH, check_same_thread=False)
         self.conn.row_factory = sqlite3.Row
         self.conn.execute("PRAGMA foreign_keys = ON")
         self._create_tables()
