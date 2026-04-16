@@ -72,16 +72,31 @@ export interface Relatorio {
   clientes_extras: Cliente[]
 }
 
-export type HonorarioTipo = 'inicial' | 'condicionado' | 'intermediario' | 'exito'
+export type HonorarioTipo = 'inicial' | 'condicionado' | 'intermediario' | 'exito' | 'mensais'
 
 export const TIPO_LABELS: Record<string, string> = {
-  inicial: 'Honorarios Iniciais',
-  condicionado: 'Honorarios Condicionados',
-  intermediario: 'Honorarios Intermediarios',
-  exito: 'Honorarios de Exito',
+  inicial: 'Honorários Iniciais',
+  condicionado: 'Honorários Condicionados',
+  intermediario: 'Honorários Intermediários',
+  exito: 'Honorários de Êxito',
+  mensais: 'Honorários Mensais',
 }
 
-export const TIPO_ORDER: HonorarioTipo[] = ['inicial', 'condicionado', 'intermediario', 'exito']
+export const TIPO_ORDER: HonorarioTipo[] = ['inicial', 'condicionado', 'intermediario', 'exito', 'mensais']
 
 export const CONTRATO_TIPOS = ['Contencioso', 'Consultoria', 'Licenciamento', 'Misto']
 export const CONTRATO_STATUS = ['Ativo', 'Encerrado', 'Quitado']
+
+export interface InadimplenteRow {
+  parcela_id: number
+  vencimento: string
+  valor: string
+  nota_fiscal: string
+  honorario_id: number
+  tipo: string
+  hipotese: string
+  contrato_id: number
+  ctt_n: string
+  cliente_id: number
+  cliente_nome: string
+}

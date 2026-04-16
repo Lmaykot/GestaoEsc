@@ -3,7 +3,7 @@ from app.database import Database
 from app.dependencies import get_db
 from app.models import (
     RelatorioResponse, RelatorioHonorario, ContratoResponse,
-    ClienteResponse, ParcelaResponse,
+    ClienteResponse, ParcelaResponse, InadimplenteRow,
 )
 
 router = APIRouter(prefix="/api/relatorio", tags=["relatorio"])
@@ -23,6 +23,12 @@ def _calc_quitacao(parcelas: list[dict]) -> str:
     if pagas == total:
         return "Quitado"
     return f"{pagas}/{total} pagas"
+
+
+@router.get("/inadimplentes", response_model=list[InadimplenteRow])
+def get_inadimplentes(db: Database = Depends(get_db)):
+    rows = db.get_inadimplentes()
+    return [dict(r) for r in rows]
 
 
 @router.get("/{contrato_id}", response_model=RelatorioResponse)

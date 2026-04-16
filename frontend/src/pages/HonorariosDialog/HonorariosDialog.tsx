@@ -87,48 +87,56 @@ export function HonorariosDialog({ open, contratoId, onClose }: HonorariosDialog
     <Modal
       open={open}
       onClose={onClose}
-      title="Cadastro de Honorarios"
+      title="Cadastro de Honorários"
       footer={
         <>
           <Button variant="secondary" onClick={onClose}>Cancelar</Button>
           <Button onClick={handleSave} disabled={saving}>
-            {saving ? 'Salvando...' : 'Salvar Honorarios'}
+            {saving ? 'Salvando...' : 'Salvar Honorários'}
           </Button>
         </>
       }
     >
-      {TIPO_ORDER.map(tipo => (
-        <div key={tipo} className={styles.section}>
-          <div className={styles.sectionTitle}>{TIPO_LABELS[tipo]}</div>
-          <div className={styles.tableHeader}>
-            <span className={styles.tableHeaderLabel}>Hipotese de Incidencia</span>
-            <span className={styles.tableHeaderLabel}>Valor</span>
-            <span style={{ width: 32 }} />
+      {TIPO_ORDER.map(tipo => {
+        const isMensal = tipo === 'mensais'
+        return (
+          <div key={tipo} className={styles.section}>
+            <div className={styles.sectionTitle}>{TIPO_LABELS[tipo]}</div>
+            <div className={styles.tableHeader}>
+              <span className={styles.tableHeaderLabel}>
+                {isMensal ? 'Vencimento Inicial' : 'Hipótese de Incidência'}
+              </span>
+              <span className={styles.tableHeaderLabel}>
+                {isMensal ? 'Valor Mensal' : 'Valor'}
+              </span>
+              <span style={{ width: 32 }} />
+            </div>
+            <div className={styles.rowsContainer}>
+              {sections[tipo]?.map((row, idx) => (
+                <div key={idx} className={styles.row}>
+                  <Input
+                    type={isMensal ? 'date' : 'text'}
+                    value={row.hipotese}
+                    onChange={e => updateRow(tipo, idx, 'hipotese', e.target.value)}
+                    placeholder={isMensal ? '' : 'Hipótese...'}
+                  />
+                  <Input
+                    value={row.valor}
+                    onChange={e => updateRow(tipo, idx, 'valor', e.target.value)}
+                    placeholder="R$ 0,00"
+                  />
+                  <button className={styles.removeBtn} onClick={() => removeRow(tipo, idx)}>
+                    &times;
+                  </button>
+                </div>
+              ))}
+            </div>
+            <Button size="sm" variant="ghost" className={styles.addBtn} onClick={() => addRow(tipo)}>
+              + Adicionar
+            </Button>
           </div>
-          <div className={styles.rowsContainer}>
-            {sections[tipo]?.map((row, idx) => (
-              <div key={idx} className={styles.row}>
-                <Input
-                  value={row.hipotese}
-                  onChange={e => updateRow(tipo, idx, 'hipotese', e.target.value)}
-                  placeholder="Hipotese..."
-                />
-                <Input
-                  value={row.valor}
-                  onChange={e => updateRow(tipo, idx, 'valor', e.target.value)}
-                  placeholder="R$ 0,00"
-                />
-                <button className={styles.removeBtn} onClick={() => removeRow(tipo, idx)}>
-                  &times;
-                </button>
-              </div>
-            ))}
-          </div>
-          <Button size="sm" variant="ghost" className={styles.addBtn} onClick={() => addRow(tipo)}>
-            + Adicionar
-          </Button>
-        </div>
-      ))}
+        )
+      })}
     </Modal>
   )
 }

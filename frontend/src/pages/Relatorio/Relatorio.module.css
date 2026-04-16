@@ -157,3 +157,15 @@
   color: var(--color-on-surface-muted);
   font-size: var(--text-sm);
 }
+
+.pdfLink {
+  font-size: var(--text-sm);
+  color: var(--color-primary);
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+}
+.pdfLink:hover {
+  text-decoration: underline;
+}

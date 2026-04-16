@@ -129,3 +129,19 @@ class RelatorioResponse(BaseModel):
     contrato: ContratoResponse
     honorarios: list[RelatorioHonorario]
     clientes_extras: list[ClienteResponse]
+
+
+# -- Inadimplentes --
+
+class InadimplenteRow(BaseModel):
+    parcela_id: int
+    vencimento: str
+    valor: str
+    nota_fiscal: str
+    honorario_id: int
+    tipo: str
+    hipotese: str
+    contrato_id: int
+    ctt_n: str
+    cliente_id: int
+    cliente_nome: str

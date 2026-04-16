@@ -6,7 +6,8 @@ const NAV_ITEMS = [
   { to: '/clientes', icon: '\u{1F465}', label: 'Clientes' },
   { to: '/contratos', icon: '\u{1F4C4}', label: 'Contratos' },
   { to: '/pagamentos', icon: '\u{1F4B3}', label: 'Pagamentos' },
-  { to: '/relatorio', icon: '\u{1F4CA}', label: 'Relatorio' },
+  { to: '/relatorio', icon: '\u{1F4CA}', label: 'Relatório' },
+  { to: '/inadimplentes', icon: '\u26A0\uFE0F', label: 'Inadimplentes' },
 ]
 
 interface AppShellProps {
@@ -19,7 +20,7 @@ export function AppShell({ children }: AppShellProps) {
       <aside className={styles.sidebar}>
         <div className={styles.logo}>
           <div className={styles.logoTitle}>GestaoEsc</div>
-          <div className={styles.logoSub}>Gestao de Contratos</div>
+          <div className={styles.logoSub}>Gestão de Contratos</div>
         </div>
         <nav className={styles.nav}>
           {NAV_ITEMS.map(item => (

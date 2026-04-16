@@ -49,8 +49,8 @@ export function Relatorio() {
     : []
 
   const getParcelamentoLabel = (h: RelatorioHonorario) => {
-    if (h.total_parcelas === 0) return 'Nao definido'
-    if (h.total_parcelas === 1) return 'A vista'
+    if (h.total_parcelas === 0) return 'Não definido'
+    if (h.total_parcelas === 1) return 'À vista'
     return `${h.total_parcelas} parcelas`
   }
 
@@ -67,7 +67,7 @@ export function Relatorio() {
 
   return (
     <div>
-      <h1 className={styles.pageTitle}>Relatorio de Gestao</h1>
+      <h1 className={styles.pageTitle}>Relatório de Gestão</h1>
       <div className={styles.page}>
         <div className={styles.listPanel}>
           <div className={styles.searchFields}>
@@ -79,7 +79,7 @@ export function Relatorio() {
             <SearchInput
               value={searchNumero}
               onChange={e => setSearchNumero(e.target.value)}
-              placeholder="Buscar por numero..."
+              placeholder="Buscar por número..."
             />
           </div>
           <Card flush className={styles.listScroll}>
@@ -96,6 +96,7 @@ export function Relatorio() {
         <Card className={styles.detailPanel}>
           {!relatorio ? (
             <div className={styles.emptyDetail}>Selecione um contrato na lista</div>
+
           ) : (
             <>
               <div className={styles.reportHeader}>
@@ -116,13 +117,25 @@ export function Relatorio() {
                   <div className={styles.metaValue}>{relatorio.contrato.advogado || '-'}</div>
                 </div>
                 <div>
-                  <div className={styles.metaLabel}>Descricao</div>
+                  <div className={styles.metaLabel}>Descrição</div>
                   <div className={styles.metaValue}>{relatorio.contrato.descricao || '-'}</div>
                 </div>
                 {relatorio.contrato.observacoes && (
                   <div style={{ gridColumn: '1 / -1' }}>
-                    <div className={styles.metaLabel}>Observacoes</div>
+                    <div className={styles.metaLabel}>Observações</div>
                     <div className={styles.metaValue}>{relatorio.contrato.observacoes}</div>
+                  </div>
+                )}
+                {relatorio.contrato.arquivo_path && selectedId && (
+                  <div>
+                    <div className={styles.metaLabel}>Documento</div>
+                    <a
+                      href={`/api/contratos/${selectedId}/pdf`}
+                      download={relatorio.contrato.arquivo_path}
+                      className={styles.pdfLink}
+                    >
+                      ⬇ Baixar PDF
+                    </a>
                   </div>
                 )}
               </div>
@@ -133,11 +146,11 @@ export function Relatorio() {
                   <table className={styles.honorarioTable}>
                     <thead>
                       <tr>
-                        <th>Hipotese</th>
+                        <th>Hipótese</th>
                         <th>Valor</th>
                         <th></th>
                         <th>Parcelamento</th>
-                        <th>Quitacao</th>
+                        <th>Quitação</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -164,7 +177,7 @@ export function Relatorio() {
               ))}
 
               {groupedHonorarios.length === 0 && (
-                <div className={styles.emptyDetail}>Nenhum honorario cadastrado</div>
+                <div className={styles.emptyDetail}>Nenhum honorário cadastrado</div>
               )}
             </>
           )}

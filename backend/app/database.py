@@ -278,5 +278,20 @@ class Database:
             'SELECT * FROM parcelas WHERE honorario_id=? ORDER BY num_parcela', (honorario_id,)
         ).fetchall()
 
+    def get_inadimplentes(self):
+        return self.conn.execute('''
+            SELECT p.id AS parcela_id, p.vencimento, p.valor, p.nota_fiscal,
+                   h.id AS honorario_id, h.tipo, h.hipotese,
+                   c.id AS contrato_id, c.ctt_n,
+                   cl.id AS cliente_id, cl.nome AS cliente_nome
+            FROM parcelas p
+            JOIN honorarios h ON p.honorario_id = h.id
+            JOIN contratos c ON h.contrato_id = c.id
+            JOIN clientes cl ON c.cliente_id = cl.id
+            WHERE p.vencimento < date('now')
+              AND (p.data_pagamento IS NULL OR p.data_pagamento = '')
+            ORDER BY p.vencimento ASC, c.ctt_n
+        ''').fetchall()
+
     def close(self):
         self.conn.close()

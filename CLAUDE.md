@@ -4,17 +4,36 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Running the Application
 
+### Docker (recommended)
 ```bash
-python main.py
-# or
-python3 main.py
+docker compose up
+```
+- API: `http://localhost:8000`
+- Frontend: `http://localhost:3000`
+
+### Local development
+
+Backend:
+```bash
+cd backend
+pip install -r requirements.txt
+uvicorn app.main:app --reload
 ```
 
-No dependencies to install — pure Python stdlib (tkinter + sqlite3). The SQLite database (`gestao_contratos.db`) is auto-created on first run. A `contratos/` directory is also auto-created for PDF attachments.
+Frontend:
+```bash
+cd frontend
+npm install
+npm run dev
+```
 
 ## Architecture
 
-**GestaoEsc** is a Portuguese-language legal contract management desktop app (tkinter + SQLite).
+**GestaoEsc** is a Portuguese-language legal contract management web app.
+
+- **Backend**: FastAPI + SQLite (`backend/`)
+- **Frontend**: React + TypeScript + Vite (`frontend/`)
+- **Deploy**: Docker Compose via GitHub Container Registry images
 
 ### Data Model (5 tables)
 
@@ -28,36 +47,41 @@ clientes ←→ contrato_clientes ←→ contratos → honorarios → parcelas
 - **honorarios**: fee structures (4 types: inicial, condicionado, intermediário, êxito) attached to a contract
 - **parcelas**: payment installments for each honorario
 
-All database access goes through the `Database` class in `database.py`. Foreign keys are enforced. Schema migrations are handled idempotently in `Database._migrate()`.
+All database access goes through the `Database` class in `backend/app/database.py`. Foreign keys are enforced. Schema migrations are handled idempotently in `Database._migrate()`. The DB path is configurable via `DB_PATH` env var (defaults to `backend/data/gestao_contratos.db`).
 
-### UI Structure
+### Backend Structure (`backend/app/`)
 
-`main.py` creates a `ttk.Notebook` with 4 tabs, each implemented in its own file:
+| File | Purpose |
+|------|---------|
+| `main.py` | FastAPI app, CORS, router registration |
+| `database.py` | `Database` class — all SQL queries |
+| `models.py` | Pydantic request/response schemas |
+| `dependencies.py` | FastAPI dependency injection (DB instance) |
+| `routers/clientes.py` | `/api/clientes` endpoints |
+| `routers/contratos.py` | `/api/contratos` endpoints |
+| `routers/honorarios.py` | `/api/honorarios` endpoints |
+| `routers/parcelas.py` | `/api/parcelas` endpoints |
+| `routers/relatorio.py` | `/api/relatorio` endpoint |
 
-| File | Tab | Purpose |
-|------|-----|---------|
-| `ui_cadastro_cliente.py` | Tab 1 | Client registration and editing (with full address decomposition) |
-| `ui_cadastro_contrato.py` | Tab 2 | Contract registration; opens `HonorariosDialog` |
-| `ui_gestao_pagamentos.py` | Tab 3 | Payment installment management |
-| `ui_relatorio.py` | Tab 4 | Management report with payment status |
-| `ui_honorarios_dialog.py` | Modal | Fee table editor, opened from Tab 2 |
+### Frontend Structure (`frontend/src/`)
 
-All tabs follow the same layout pattern: **left panel** (search + Treeview list) / **right panel** (form or detail view).
-
-`styles.py` centralizes the entire color palette, fonts, and widget style definitions. Use the constants (`C_ACCENT`, `C_BG`, etc.) and helpers (`card_frame()`, `section_header()`, `field_label()`) from there rather than hardcoding styles.
-
-### Key Interactions Between Tabs
-
-- Tab 2 → opens `HonorariosDialog` (modal) after saving a contract ("Salvar e Avançar →")
-- Tab 2 also has "Salvar" (save only, without opening dialog)
-- Tab 4 report → "Gerir" link buttons switch focus to Tab 3 for the selected honorario
-- CTT-N numbers are auto-generated via `db.get_next_ctt_n()`
+| Path | Purpose |
+|------|---------|
+| `App.tsx` | Router setup |
+| `layouts/AppShell.tsx` | Top-level layout with tab navigation |
+| `pages/CadastroCliente/` | Client registration and editing |
+| `pages/CadastroContrato/` | Contract registration |
+| `pages/HonorariosDialog/` | Fee table editor (modal) |
+| `pages/GestaoPagamentos/` | Payment installment management |
+| `pages/Relatorio/` | Management report with payment status |
+| `design-system/components/` | Shared UI components (Button, Input, Select, Card, Modal, DataTable, etc.) |
 
 ### Contract Features
 
-- **Status**: Ativo / Encerrado / Quitado (displayed as colored radio buttons)
+- **Status**: Ativo / Encerrado / Quitado
 - **Multiple clients**: a contract has one primary client (`contratos.cliente_id`) plus optional additional clients stored in `contrato_clientes`
-- **PDF attachment**: a PDF file can be copied into `contratos/` and linked to the contract via `arquivo_path`
+- **PDF attachment**: linked to the contract via `arquivo_path`, stored in `contratos/` volume
+- **CTT-N numbers**: auto-generated via `db.get_next_ctt_n()` (format: `CTT-N-001`)
 
 ## Domain Vocabulary
 

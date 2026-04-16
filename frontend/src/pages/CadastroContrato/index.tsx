@@ -26,6 +26,7 @@ export function CadastroContrato() {
   const [showDropdown, setShowDropdown] = useState(false)
   const [extraClientes, setExtraClientes] = useState<Cliente[]>([])
   const [saving, setSaving] = useState(false)
+  const [pdfError, setPdfError] = useState('')
   const [honorariosOpen, setHonorariosOpen] = useState(false)
   const [honorariosContratoId, setHonorariosContratoId] = useState<number | null>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
@@ -133,8 +134,15 @@ export function CadastroContrato() {
   const handlePdfUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
     if (!file || !selectedId) return
-    const result = await contratosApi.uploadPdf(selectedId, file)
-    setForm(prev => ({ ...prev, arquivo_path: result.arquivo_path }))
+    setPdfError('')
+    try {
+      const result = await contratosApi.uploadPdf(selectedId, file)
+      setForm(prev => ({ ...prev, arquivo_path: result.arquivo_path }))
+    } catch (err) {
+      setPdfError('Erro ao fazer upload do PDF. Tente novamente.')
+    } finally {
+      e.target.value = ''
+    }
   }
 
   const handlePdfRemove = async () => {
@@ -250,20 +258,20 @@ export function CadastroContrato() {
             <Input
               value={form.advogado}
               onChange={e => setForm(prev => ({ ...prev, advogado: e.target.value }))}
-              placeholder="Nome do advogado responsavel"
+              placeholder="Nome do advogado responsável"
             />
           </div>
 
           <div className={styles.section}>
-            <SectionHeader text="Objeto e Observacoes" />
+            <SectionHeader text="Objeto e Observações" />
             <TextArea
-              label="Descricao"
+              label="Descrição"
               value={form.descricao}
               onChange={e => setForm(prev => ({ ...prev, descricao: e.target.value }))}
               rows={3}
             />
             <TextArea
-              label="Observacoes"
+              label="Observações"
               value={form.observacoes}
               onChange={e => setForm(prev => ({ ...prev, observacoes: e.target.value }))}
               rows={3}
@@ -279,9 +287,13 @@ export function CadastroContrato() {
                 <>
                   <span className={styles.pdfName}>{form.arquivo_path}</span>
                   {selectedId && (
-                    <Button size="sm" variant="ghost" onClick={() => window.open(`/api/contratos/${selectedId}/pdf`, '_blank')}>
-                      Abrir
-                    </Button>
+                    <a
+                      href={`/api/contratos/${selectedId}/pdf`}
+                      download={form.arquivo_path}
+                      className={styles.pdfDownloadLink}
+                    >
+                      Baixar PDF
+                    </a>
                   )}
                   <Button size="sm" variant="ghost" onClick={handlePdfRemove}>Remover</Button>
                 </>
@@ -295,6 +307,7 @@ export function CadastroContrato() {
                 </>
               )}
             </div>
+            {pdfError && <div style={{ color: 'var(--color-danger, red)', fontSize: 'var(--text-xs)', marginTop: 'var(--space-2)' }}>{pdfError}</div>}
           </div>
 
           <div className={styles.actions}>
@@ -303,7 +316,7 @@ export function CadastroContrato() {
               Salvar
             </Button>
             <Button onClick={() => handleSave(true)} disabled={saving || !clienteId}>
-              {saving ? 'Salvando...' : 'Salvar e Avancar'}
+              {saving ? 'Salvando...' : 'Salvar e Avançar'}
             </Button>
           </div>
         </Card>

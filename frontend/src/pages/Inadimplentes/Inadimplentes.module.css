@@ -1,0 +1,87 @@
+.pageTitle {
+  font-family: var(--font-heading);
+  font-size: var(--text-2xl);
+  font-weight: 700;
+  color: var(--color-on-surface);
+  margin-bottom: var(--space-6);
+}
+
+.card {
+  overflow-x: auto;
+}
+
+.empty {
+  padding: var(--space-8);
+  text-align: center;
+  color: var(--color-on-surface-muted);
+  font-size: var(--text-sm);
+}
+
+.table {
+  width: 100%;
+  border-spacing: 0;
+}
+
+.table thead th {
+  font-size: var(--text-xs);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--color-primary);
+  text-align: left;
+  padding: var(--space-2) var(--space-4);
+  background: var(--color-surface-container);
+  border-bottom: 1px solid var(--color-outline-variant);
+  white-space: nowrap;
+}
+
+.table thead th:first-child {
+  border-radius: var(--radius-md) 0 0 0;
+}
+.table thead th:last-child {
+  border-radius: 0 var(--radius-md) 0 0;
+}
+
+.table tbody td {
+  padding: var(--space-3) var(--space-4);
+  font-size: var(--text-sm);
+  border-bottom: 1px solid var(--color-outline-variant);
+  vertical-align: middle;
+}
+
+.table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.table tbody tr:hover td {
+  background: var(--color-surface-container);
+}
+
+.cttN {
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.hipotese {
+  max-width: 220px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.vencimento {
+  white-space: nowrap;
+  color: var(--color-status-pendente-fg, #b91c1c);
+  font-weight: 500;
+}
+
+.gerirLink {
+  color: var(--color-primary);
+  font-weight: 500;
+  cursor: pointer;
+  font-size: var(--text-sm);
+  white-space: nowrap;
+}
+.gerirLink:hover {
+  text-decoration: underline;
+}

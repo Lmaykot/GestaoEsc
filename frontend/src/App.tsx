@@ -4,6 +4,7 @@ import { CadastroCliente } from './pages/CadastroCliente'
 import { CadastroContrato } from './pages/CadastroContrato'
 import { GestaoPagamentos } from './pages/GestaoPagamentos'
 import { Relatorio } from './pages/Relatorio'
+import { Inadimplentes } from './pages/Inadimplentes'
 
 export default function App() {
   return (
@@ -14,6 +15,7 @@ export default function App() {
           <Route path="/contratos" element={<CadastroContrato />} />
           <Route path="/pagamentos" element={<GestaoPagamentos />} />
           <Route path="/relatorio" element={<Relatorio />} />
+          <Route path="/inadimplentes" element={<Inadimplentes />} />
           <Route path="*" element={<Navigate to="/clientes" replace />} />
         </Routes>
       </AppShell>

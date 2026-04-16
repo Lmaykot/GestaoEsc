@@ -113,7 +113,7 @@ export function GestaoPagamentos() {
 
   return (
     <div>
-      <h1 className={styles.pageTitle}>Gestao de Pagamentos</h1>
+      <h1 className={styles.pageTitle}>Gestão de Pagamentos</h1>
       <div className={styles.page}>
         <div className={styles.treePanel}>
           <SearchInput
@@ -140,17 +140,17 @@ export function GestaoPagamentos() {
               </div>
             ))}
             {tree.length === 0 && (
-              <div className={styles.emptyDetail}>Nenhum honorario encontrado</div>
+              <div className={styles.emptyDetail}>Nenhum honorário encontrado</div>
             )}
           </Card>
         </div>
 
         <Card className={styles.detailPanel}>
           {!selectedInfo ? (
-            <div className={styles.emptyDetail}>Selecione um honorario na lista</div>
+            <div className={styles.emptyDetail}>Selecione um honorário na lista</div>
           ) : (
             <>
-              <SectionHeader text="Informacoes" />
+              <SectionHeader text="Informações" />
               <div className={styles.infoGrid}>
                 <div>
                   <div className={styles.infoLabel}>Cliente</div>
@@ -165,7 +165,7 @@ export function GestaoPagamentos() {
                   <div className={styles.infoValue}>{TIPO_LABELS[selectedInfo.tipo] || selectedInfo.tipo}</div>
                 </div>
                 <div>
-                  <div className={styles.infoLabel}>Hipotese</div>
+                  <div className={styles.infoLabel}>Hipótese</div>
                   <div className={styles.infoValue}>{selectedInfo.hipotese || '-'}</div>
                 </div>
                 <div>
