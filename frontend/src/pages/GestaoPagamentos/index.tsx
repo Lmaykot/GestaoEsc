@@ -33,6 +33,7 @@ export function GestaoPagamentos() {
   const [selectedInfo, setSelectedInfo] = useState<HonorarioSearchResult | null>(null)
   const [parcelas, setParcelas] = useState<ParcelaForm[]>([])
   const [saving, setSaving] = useState(false)
+  const [mobileShowDetail, setMobileShowDetail] = useState(false)
 
   const buildTree = (results: HonorarioSearchResult[]): TreeContract[] => {
     const map = new Map<number, TreeContract>()
@@ -115,7 +116,7 @@ export function GestaoPagamentos() {
     <div>
       <h1 className={styles.pageTitle}>Gestão de Pagamentos</h1>
       <div className={styles.page}>
-        <div className={styles.treePanel}>
+        <div className={`${styles.treePanel} ${mobileShowDetail ? styles.mobileHidden : ''}`}>
           <SearchInput
             value={search}
             onChange={e => setSearch(e.target.value)}
@@ -132,7 +133,7 @@ export function GestaoPagamentos() {
                   <div
                     key={h.honorario_id}
                     className={`${styles.honorarioItem} ${selectedHId === h.honorario_id ? styles.selected : ''}`}
-                    onClick={() => loadHonorario(h.honorario_id)}
+                    onClick={() => { loadHonorario(h.honorario_id); setMobileShowDetail(true) }}
                   >
                     {TIPO_LABELS[h.tipo] || h.tipo} &middot; R$ {h.valor} {h.hipotese && `| ${h.hipotese}`}
                   </div>
@@ -145,7 +146,12 @@ export function GestaoPagamentos() {
           </Card>
         </div>
 
-        <Card className={styles.detailPanel}>
+        <Card className={`${styles.detailPanel} ${mobileShowDetail ? styles.mobileVisible : ''}`}>
+          {mobileShowDetail && (
+            <button className={styles.mobileBackBtn} onClick={() => { setMobileShowDetail(false); setSelectedHId(null); setSelectedInfo(null) }}>
+              ← Voltar
+            </button>
+          )}
           {!selectedInfo ? (
             <div className={styles.emptyDetail}>Selecione um honorário na lista</div>
           ) : (

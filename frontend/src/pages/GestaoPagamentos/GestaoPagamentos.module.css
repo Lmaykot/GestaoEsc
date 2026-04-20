@@ -171,3 +171,89 @@
   color: var(--color-on-surface-muted);
   font-size: var(--text-sm);
 }
+
+/* ─── Mobile ─── */
+@media (max-width: 768px) {
+  .pageTitle {
+    font-size: var(--text-xl);
+    margin-bottom: var(--space-4);
+  }
+
+  .page {
+    grid-template-columns: 1fr;
+    height: auto;
+    gap: var(--space-3);
+  }
+
+  .detailPanel {
+    display: none;
+  }
+
+  .detailPanel.mobileVisible {
+    display: block;
+  }
+
+  .treePanel.mobileHidden {
+    display: none;
+  }
+
+  /* Ocultar ações de edição no mobile */
+  .parcelaActions {
+    display: none;
+  }
+
+  .removeBtn {
+    display: none;
+  }
+
+  /* Ajustar grid de parcelas no mobile */
+  .parcelaHeader {
+    grid-template-columns: 40px 1fr 1fr 1fr;
+  }
+
+  .parcelaRow {
+    grid-template-columns: 40px 1fr 1fr 1fr;
+  }
+
+  /* Ocultar colunas nota_fiscal e data_pagamento (editar) no mobile */
+  .parcelaHeader .parcelaHeaderLabel:nth-child(4),
+  .parcelaHeader .parcelaHeaderLabel:nth-child(5),
+  .parcelaHeader .parcelaHeaderLabel:nth-child(6) {
+    display: none;
+  }
+
+  .parcelaRow > *:nth-child(4),
+  .parcelaRow > *:nth-child(5),
+  .parcelaRow > *:nth-child(6) {
+    display: none;
+  }
+
+  .infoGrid {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .mobileBackBtn {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    padding: var(--space-2) var(--space-4);
+    margin-bottom: var(--space-4);
+    background: var(--color-surface-container);
+    border: none;
+    border-radius: var(--radius-full);
+    font-size: var(--text-sm);
+    font-weight: 600;
+    color: var(--color-on-surface-variant);
+    cursor: pointer;
+    font-family: var(--font-body);
+    transition: background var(--transition-fast);
+  }
+
+  .mobileBackBtn:hover {
+    background: var(--color-surface-container-high);
+  }
+}
+
+.mobileBackBtn {
+  display: none;
+}

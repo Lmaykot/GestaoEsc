@@ -18,6 +18,7 @@ export function Relatorio() {
   const debouncedNumero = useDebounce(searchNumero)
   const [selectedId, setSelectedId] = useState<number | null>(null)
   const [relatorio, setRelatorio] = useState<RelatorioType | null>(null)
+  const [mobileShowDetail, setMobileShowDetail] = useState(false)
 
   const loadList = useCallback(async () => {
     const data = await contratosApi.list({
@@ -33,6 +34,13 @@ export function Relatorio() {
     setSelectedId(c.id)
     const data = await honorariosApi.getRelatorio(c.id)
     setRelatorio(data)
+    setMobileShowDetail(true)
+  }
+
+  const handleMobileBack = () => {
+    setMobileShowDetail(false)
+    setSelectedId(null)
+    setRelatorio(null)
   }
 
   const handleGerir = (honorarioId: number) => {
@@ -69,7 +77,7 @@ export function Relatorio() {
     <div>
       <h1 className={styles.pageTitle}>Relatório de Gestão</h1>
       <div className={styles.page}>
-        <div className={styles.listPanel}>
+        <div className={`${styles.listPanel} ${mobileShowDetail ? styles.mobileHidden : ''}`}>
           <div className={styles.searchFields}>
             <SearchInput
               value={searchCliente}
@@ -93,7 +101,12 @@ export function Relatorio() {
           </Card>
         </div>
 
-        <Card className={styles.detailPanel}>
+        <Card className={`${styles.detailPanel} ${mobileShowDetail ? styles.mobileVisible : ''}`}>
+          {mobileShowDetail && (
+            <button className={styles.mobileBackBtn} onClick={handleMobileBack}>
+              ← Voltar
+            </button>
+          )}
           {!relatorio ? (
             <div className={styles.emptyDetail}>Selecione um contrato na lista</div>
 

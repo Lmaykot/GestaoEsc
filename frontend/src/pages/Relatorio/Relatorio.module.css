@@ -169,3 +169,64 @@
 .pdfLink:hover {
   text-decoration: underline;
 }
+
+/* ─── Mobile ─── */
+@media (max-width: 768px) {
+  .pageTitle {
+    font-size: var(--text-xl);
+    margin-bottom: var(--space-4);
+  }
+
+  .page {
+    grid-template-columns: 1fr;
+    height: auto;
+    gap: var(--space-3);
+  }
+
+  .detailPanel {
+    display: none;
+  }
+
+  .detailPanel.mobileVisible {
+    display: block;
+  }
+
+  .listPanel.mobileHidden {
+    display: none;
+  }
+
+  .mobileBackBtn {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    padding: var(--space-2) var(--space-4);
+    margin-bottom: var(--space-4);
+    background: var(--color-surface-container);
+    border: none;
+    border-radius: var(--radius-full);
+    font-size: var(--text-sm);
+    font-weight: 600;
+    color: var(--color-on-surface-variant);
+    cursor: pointer;
+    font-family: var(--font-body);
+    transition: background var(--transition-fast);
+  }
+
+  .mobileBackBtn:hover {
+    background: var(--color-surface-container-high);
+  }
+
+  .reportMeta {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .honorarioTable thead th:nth-child(3),
+  .honorarioTable tbody td:nth-child(3) {
+    display: none;
+  }
+}
+
+/* Desktop: esconder botão voltar */
+.mobileBackBtn {
+  display: none;
+}

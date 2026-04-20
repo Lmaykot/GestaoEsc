@@ -23,9 +23,15 @@ export function Inadimplentes() {
     return `${day}/${m}/${y}`
   }
 
+  const handleGerir = (honorarioId: number) => {
+    navigate(`/pagamentos?honorario_id=${honorarioId}`)
+  }
+
   return (
     <div>
       <h1 className={styles.pageTitle}>Inadimplentes</h1>
+
+      {/* Desktop: tabela */}
       <Card className={styles.card}>
         {loading ? (
           <div className={styles.empty}>Carregando...</div>
@@ -56,7 +62,7 @@ export function Inadimplentes() {
                   <td>
                     <span
                       className={styles.gerirLink}
-                      onClick={() => navigate(`/pagamentos?honorario_id=${r.honorario_id}`)}
+                      onClick={() => handleGerir(r.honorario_id)}
                     >
                       Gerir
                     </span>
@@ -67,6 +73,39 @@ export function Inadimplentes() {
           </table>
         )}
       </Card>
+
+      {/* Mobile: cards */}
+      {loading ? (
+        <div className={`${styles.mobileList}`}>
+          <div className={styles.empty}>Carregando...</div>
+        </div>
+      ) : rows.length === 0 ? (
+        <div className={styles.mobileList}>
+          <div className={styles.empty}>Nenhuma parcela em atraso.</div>
+        </div>
+      ) : (
+        <div className={styles.mobileList}>
+          {rows.map(r => (
+            <div key={r.parcela_id} className={styles.mobileCard}>
+              <div className={styles.mobileCardHeader}>
+                <span className={styles.mobileCttN}>{r.ctt_n}</span>
+                <span className={styles.mobileVencimento}>{formatDate(r.vencimento)}</span>
+              </div>
+              <div className={styles.mobileCliente}>{r.cliente_nome}</div>
+              <div className={styles.mobileTipo}>{TIPO_LABELS[r.tipo] || r.tipo}</div>
+              {r.hipotese && (
+                <div className={styles.mobileHipotese}>{r.hipotese}</div>
+              )}
+              <button
+                className={styles.mobileGerirBtn}
+                onClick={() => handleGerir(r.honorario_id)}
+              >
+                Gerir pagamento →
+              </button>
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   )
 }

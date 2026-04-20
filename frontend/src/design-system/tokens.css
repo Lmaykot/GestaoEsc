@@ -90,3 +90,67 @@
   /* Sidebar */
   --sidebar-width: 260px;
 }
+
+[data-theme="dark"] {
+  /* Primary */
+  --color-primary: #4a9fd4;
+  --color-primary-dim: #3a8fc4;
+  --color-primary-hover: #2a7fb4;
+  --color-primary-container: #1a3a50;
+  --color-on-primary: #0f1520;
+  --color-on-primary-container: #b8d9f0;
+
+  /* Secondary */
+  --color-secondary: #6baed6;
+  --color-secondary-container: #1a2c3d;
+  --color-on-secondary-container: #a8cceb;
+
+  /* Surface hierarchy */
+  --color-surface: #0f1520;
+  --color-surface-container-lowest: #0a1018;
+  --color-surface-container-low: #141c2b;
+  --color-surface-container: #1a2438;
+  --color-surface-container-high: #1f2a40;
+  --color-surface-container-highest: #243048;
+
+  /* Text */
+  --color-on-surface: #e2e8f4;
+  --color-on-surface-variant: #94a3b8;
+  --color-on-surface-muted: #64748b;
+
+  /* Outline */
+  --color-outline: #334155;
+  --color-outline-variant: rgba(74, 159, 212, 0.12);
+
+  /* Status */
+  --color-status-ativo-bg: #14532d;
+  --color-status-ativo-fg: #86efac;
+  --color-status-encerrado-bg: #450a0a;
+  --color-status-encerrado-fg: #fca5a5;
+  --color-status-quitado-bg: #1e3a5f;
+  --color-status-quitado-fg: #93c5fd;
+  --color-status-pendente-bg: #451a03;
+  --color-status-pendente-fg: #fcd34d;
+
+  /* Semantic */
+  --color-success: #22c55e;
+  --color-warning: #f59e0b;
+  --color-danger: #f87171;
+  --color-danger-hover: #ef4444;
+
+  /* Shadows */
+  --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.4);
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.5), 0 1px 2px rgba(0, 0, 0, 0.4);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.6), 0 2px 4px rgba(0, 0, 0, 0.4);
+  --shadow-lg: 0 12px 32px rgba(0, 0, 0, 0.7), 0 4px 8px rgba(0, 0, 0, 0.5);
+  --shadow-xl: 0 16px 48px rgba(0, 0, 0, 0.8), 0 8px 16px rgba(0, 0, 0, 0.5);
+
+  /* Glass */
+  --glass-bg: rgba(20, 28, 43, 0.88);
+  --glass-bg-nav: rgba(15, 21, 32, 0.92);
+  --glass-border: 1px solid rgba(255, 255, 255, 0.06);
+
+  /* Gradients */
+  --gradient-primary: linear-gradient(145deg, #4a9fd4 0%, #2a7fb4 100%);
+  --gradient-surface: linear-gradient(180deg, var(--color-surface-container-low) 0%, var(--color-surface) 100%);
+}
