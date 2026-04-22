@@ -99,16 +99,17 @@ export function HonorariosDialog({ open, contratoId, onClose }: HonorariosDialog
     >
       {TIPO_ORDER.map(tipo => {
         const isMensal = tipo === 'mensais'
+        const isHora = tipo === 'hora'
+        const hipoteseLabel = isMensal ? 'Vencimento Inicial' : isHora ? 'Descrição' : 'Hipótese de Incidência'
+        const valorLabel = isMensal ? 'Valor Mensal' : isHora ? 'Valor da Hora' : 'Valor'
+        const hipotesePlaceholder = isMensal ? '' : isHora ? 'Ex.: Hora de advogado pleno' : 'Hipótese...'
+        const valorPlaceholder = isHora ? 'R$ 0,00 / hora' : 'R$ 0,00'
         return (
           <div key={tipo} className={styles.section}>
             <div className={styles.sectionTitle}>{TIPO_LABELS[tipo]}</div>
             <div className={styles.tableHeader}>
-              <span className={styles.tableHeaderLabel}>
-                {isMensal ? 'Vencimento Inicial' : 'Hipótese de Incidência'}
-              </span>
-              <span className={styles.tableHeaderLabel}>
-                {isMensal ? 'Valor Mensal' : 'Valor'}
-              </span>
+              <span className={styles.tableHeaderLabel}>{hipoteseLabel}</span>
+              <span className={styles.tableHeaderLabel}>{valorLabel}</span>
               <span style={{ width: 32 }} />
             </div>
             <div className={styles.rowsContainer}>
@@ -118,12 +119,12 @@ export function HonorariosDialog({ open, contratoId, onClose }: HonorariosDialog
                     type={isMensal ? 'date' : 'text'}
                     value={row.hipotese}
                     onChange={e => updateRow(tipo, idx, 'hipotese', e.target.value)}
-                    placeholder={isMensal ? '' : 'Hipótese...'}
+                    placeholder={hipotesePlaceholder}
                   />
                   <Input
                     value={row.valor}
                     onChange={e => updateRow(tipo, idx, 'valor', e.target.value)}
-                    placeholder="R$ 0,00"
+                    placeholder={valorPlaceholder}
                   />
                   <button className={styles.removeBtn} onClick={() => removeRow(tipo, idx)}>
                     &times;

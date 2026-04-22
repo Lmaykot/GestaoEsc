@@ -29,6 +29,18 @@
   padding-right: var(--space-2);
 }
 
+.emptyState {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  min-height: 400px;
+  text-align: center;
+  color: var(--color-on-surface-muted);
+  font-size: var(--text-sm);
+  padding: var(--space-8);
+}
+
 .formGrid {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -195,13 +207,15 @@
   }
 
   .page {
-    grid-template-columns: 1fr;
+    display: block;
     height: auto;
+    width: 100%;
+    overflow-x: hidden;
   }
 
   /* Ocultar painel de formulário — read-only no mobile */
   .formPanel {
-    display: none;
+    display: none !important;
   }
 
   /* Ocultar botão "Novo Contrato" */
@@ -211,11 +225,13 @@
 
   .listPanel {
     height: auto;
+    width: 100%;
   }
 
   .listScroll {
     height: auto;
-    max-height: calc(100vh - 200px);
+    max-height: calc(100vh - 220px);
     overflow-y: auto;
+    overflow-x: auto;
   }
 }

@@ -1,12 +1,30 @@
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useMemo } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { honorariosApi } from '../../api/honorarios'
 import { parcelasApi } from '../../api/parcelas'
 import { Card, Button, Input, SearchInput, SectionHeader } from '../../design-system/components'
 import type { HonorarioSearchResult } from '../../types'
 import { useDebounce } from '../../hooks/useDebounce'
-import { TIPO_LABELS } from '../../types'
+import { TIPO_LABELS, TIPO_ORDER } from '../../types'
 import styles from './GestaoPagamentos.module.css'
+
+function groupByTipo(honorarios: HonorarioSearchResult[]) {
+  const map = new Map<string, HonorarioSearchResult[]>()
+  for (const h of honorarios) {
+    if (!map.has(h.tipo)) map.set(h.tipo, [])
+    map.get(h.tipo)!.push(h)
+  }
+  const knownTipos = (TIPO_ORDER as readonly string[]).filter(t => map.has(t))
+  const unknownTipos = [...map.keys()].filter(t => !(TIPO_ORDER as readonly string[]).includes(t))
+  return [...knownTipos, ...unknownTipos].map(tipo => ({ tipo, items: map.get(tipo)! }))
+}
+
+function handleRowKeyDown(e: React.KeyboardEvent, onActivate: () => void) {
+  if (e.key === 'Enter' || e.key === ' ') {
+    e.preventDefault()
+    onActivate()
+  }
+}
 
 interface ParcelaForm {
   num: number
@@ -29,6 +47,7 @@ export function GestaoPagamentos() {
   const debouncedSearch = useDebounce(search)
   const [tree, setTree] = useState<TreeContract[]>([])
   const [expanded, setExpanded] = useState<Set<number>>(new Set())
+  const [expandedTipos, setExpandedTipos] = useState<Set<string>>(new Set())
   const [selectedHId, setSelectedHId] = useState<number | null>(null)
   const [selectedInfo, setSelectedInfo] = useState<HonorarioSearchResult | null>(null)
   const [parcelas, setParcelas] = useState<ParcelaForm[]>([])
@@ -90,6 +109,19 @@ export function GestaoPagamentos() {
     })
   }
 
+  const toggleTipoExpand = (key: string) => {
+    setExpandedTipos(prev => {
+      const next = new Set(prev)
+      if (next.has(key)) next.delete(key); else next.add(key)
+      return next
+    })
+  }
+
+  const treeGrouped = useMemo(
+    () => tree.map(c => ({ ...c, groups: groupByTipo(c.honorarios) })),
+    [tree],
+  )
+
   const addParcela = () => {
     setParcelas(prev => [...prev, { num: prev.length + 1, valor: '', vencimento: '', nota_fiscal: '', data_pagamento: '' }])
   }
@@ -123,23 +155,64 @@ export function GestaoPagamentos() {
             placeholder="Buscar por cliente ou contrato..."
           />
           <Card flush className={styles.treeScroll}>
-            {tree.map(c => (
-              <div key={c.contrato_id} className={styles.contractNode}>
-                <div className={styles.contractHeader} onClick={() => toggleExpand(c.contrato_id)}>
-                  <span className={`${styles.chevron} ${expanded.has(c.contrato_id) ? styles.chevronOpen : ''}`}>&#x25B6;</span>
-                  {c.ctt_n} &mdash; {c.cliente_nome}
-                </div>
-                {expanded.has(c.contrato_id) && c.honorarios.map(h => (
+            {treeGrouped.map(c => {
+              const isContractOpen = expanded.has(c.contrato_id)
+              const toggleContract = () => toggleExpand(c.contrato_id)
+              return (
+                <div key={c.contrato_id} className={styles.contractNode}>
                   <div
-                    key={h.honorario_id}
-                    className={`${styles.honorarioItem} ${selectedHId === h.honorario_id ? styles.selected : ''}`}
-                    onClick={() => { loadHonorario(h.honorario_id); setMobileShowDetail(true) }}
+                    className={styles.contractHeader}
+                    role="button"
+                    tabIndex={0}
+                    aria-expanded={isContractOpen}
+                    onClick={toggleContract}
+                    onKeyDown={e => handleRowKeyDown(e, toggleContract)}
                   >
-                    {TIPO_LABELS[h.tipo] || h.tipo} &middot; R$ {h.valor} {h.hipotese && `| ${h.hipotese}`}
+                    <span className={`${styles.chevron} ${isContractOpen ? styles.chevronOpen : ''}`}>&#x25B6;</span>
+                    {c.ctt_n} &mdash; {c.cliente_nome}
                   </div>
-                ))}
-              </div>
-            ))}
+                  {isContractOpen && c.groups.map(group => {
+                    const tipoKey = `${c.contrato_id}-${group.tipo}`
+                    const isTipoOpen = expandedTipos.has(tipoKey)
+                    const toggleTipo = () => toggleTipoExpand(tipoKey)
+                    return (
+                      <div key={group.tipo}>
+                        <div
+                          className={styles.tipoHeader}
+                          role="button"
+                          tabIndex={0}
+                          aria-expanded={isTipoOpen}
+                          onClick={toggleTipo}
+                          onKeyDown={e => handleRowKeyDown(e, toggleTipo)}
+                        >
+                          <span className={`${styles.chevron} ${isTipoOpen ? styles.chevronOpen : ''}`}>&#x25B6;</span>
+                          {TIPO_LABELS[group.tipo] || group.tipo}
+                          <span className={styles.tipoCount}>{group.items.length}</span>
+                        </div>
+                        {isTipoOpen && group.items.map(h => {
+                          const activate = () => { loadHonorario(h.honorario_id); setMobileShowDetail(true) }
+                          const isSelected = selectedHId === h.honorario_id
+                          return (
+                            <div
+                              key={h.honorario_id}
+                              className={`${styles.honorarioItem} ${isSelected ? styles.selected : ''}`}
+                              role="button"
+                              tabIndex={0}
+                              aria-pressed={isSelected}
+                              onClick={activate}
+                              onKeyDown={e => handleRowKeyDown(e, activate)}
+                            >
+                              <div className={styles.honorarioHipotese}>{h.hipotese || 'Sem hipótese'}</div>
+                              <div className={styles.honorarioValor}>R$ {h.valor}</div>
+                            </div>
+                          )
+                        })}
+                      </div>
+                    )
+                  })}
+                </div>
+              )
+            })}
             {tree.length === 0 && (
               <div className={styles.emptyDetail}>Nenhum honorário encontrado</div>
             )}

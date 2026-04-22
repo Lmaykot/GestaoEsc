@@ -9,24 +9,54 @@ import { TIPO_ORDER, TIPO_LABELS } from '../../types'
 import { useDebounce } from '../../hooks/useDebounce'
 import styles from './Relatorio.module.css'
 
+const DESCRICAO_LIMIT = 160
+
+function DescricaoBlock({ descricao }: { descricao: string }) {
+  const [expanded, setExpanded] = useState(false)
+  const isLong = descricao.length > DESCRICAO_LIMIT
+  const shown = expanded || !isLong ? descricao : `${descricao.slice(0, DESCRICAO_LIMIT).trim()}…`
+  return (
+    <div className={styles.descricaoValue}>
+      {shown}
+      {isLong && (
+        <button
+          className={styles.readMoreBtn}
+          onClick={() => setExpanded(v => !v)}
+          type="button"
+        >
+          {expanded ? 'Mostrar menos' : 'Leia mais'}
+        </button>
+      )}
+    </div>
+  )
+}
+
 export function Relatorio() {
   const navigate = useNavigate()
   const [contratos, setContratos] = useState<Contrato[]>([])
-  const [searchCliente, setSearchCliente] = useState('')
-  const [searchNumero, setSearchNumero] = useState('')
-  const debouncedCliente = useDebounce(searchCliente)
-  const debouncedNumero = useDebounce(searchNumero)
+  const [search, setSearch] = useState('')
+  const debouncedSearch = useDebounce(search)
   const [selectedId, setSelectedId] = useState<number | null>(null)
   const [relatorio, setRelatorio] = useState<RelatorioType | null>(null)
   const [mobileShowDetail, setMobileShowDetail] = useState(false)
 
   const loadList = useCallback(async () => {
-    const data = await contratosApi.list({
-      cliente_nome: debouncedCliente,
-      numero: debouncedNumero,
-    })
-    setContratos(data)
-  }, [debouncedCliente, debouncedNumero])
+    const [byCliente, byNumero] = await Promise.all([
+      contratosApi.list({ cliente_nome: debouncedSearch }),
+      debouncedSearch
+        ? contratosApi.list({ numero: debouncedSearch })
+        : Promise.resolve([] as Contrato[]),
+    ])
+    const seen = new Set<number>()
+    const merged: Contrato[] = []
+    for (const c of [...byCliente, ...byNumero]) {
+      if (!seen.has(c.id)) {
+        seen.add(c.id)
+        merged.push(c)
+      }
+    }
+    setContratos(merged)
+  }, [debouncedSearch])
 
   useEffect(() => { loadList() }, [loadList])
 
@@ -80,14 +110,9 @@ export function Relatorio() {
         <div className={`${styles.listPanel} ${mobileShowDetail ? styles.mobileHidden : ''}`}>
           <div className={styles.searchFields}>
             <SearchInput
-              value={searchCliente}
-              onChange={e => setSearchCliente(e.target.value)}
-              placeholder="Buscar por cliente..."
-            />
-            <SearchInput
-              value={searchNumero}
-              onChange={e => setSearchNumero(e.target.value)}
-              placeholder="Buscar por número..."
+              value={search}
+              onChange={e => setSearch(e.target.value)}
+              placeholder="Buscar por cliente ou contrato..."
             />
           </div>
           <Card flush className={styles.listScroll}>
@@ -129,9 +154,9 @@ export function Relatorio() {
                   <div className={styles.metaLabel}>Advogado</div>
                   <div className={styles.metaValue}>{relatorio.contrato.advogado || '-'}</div>
                 </div>
-                <div>
+                <div style={{ gridColumn: '1 / -1' }}>
                   <div className={styles.metaLabel}>Descrição</div>
-                  <div className={styles.metaValue}>{relatorio.contrato.descricao || '-'}</div>
+                  <DescricaoBlock descricao={relatorio.contrato.descricao || '-'} />
                 </div>
                 {relatorio.contrato.observacoes && (
                   <div style={{ gridColumn: '1 / -1' }}>
@@ -157,6 +182,13 @@ export function Relatorio() {
                 <div key={group.tipo} className={styles.honorarioSection}>
                   <SectionHeader text={TIPO_LABELS[group.tipo]} />
                   <table className={styles.honorarioTable}>
+                    <colgroup>
+                      <col className={styles.colHipotese} />
+                      <col className={styles.colValor} />
+                      <col className={styles.colGerir} />
+                      <col className={styles.colParcelamento} />
+                      <col className={styles.colQuitacao} />
+                    </colgroup>
                     <thead>
                       <tr>
                         <th>Hipótese</th>

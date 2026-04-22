@@ -70,6 +70,30 @@
   color: var(--color-on-surface);
 }
 
+.descricaoValue {
+  font-size: var(--text-sm);
+  color: var(--color-on-surface);
+  white-space: pre-wrap;
+  line-height: var(--leading-normal, 1.5);
+}
+
+.readMoreBtn {
+  display: inline;
+  margin-left: var(--space-1);
+  padding: 0;
+  background: none;
+  border: none;
+  color: var(--color-primary);
+  font-weight: 600;
+  font-size: var(--text-sm);
+  cursor: pointer;
+  font-family: var(--font-body);
+}
+
+.readMoreBtn:hover {
+  text-decoration: underline;
+}
+
 .honorarioSection {
   margin-bottom: var(--space-6);
 }
@@ -77,7 +101,14 @@
 .honorarioTable {
   width: 100%;
   border-spacing: 0;
+  table-layout: fixed;
 }
+
+.honorarioTable col.colHipotese { width: 40%; }
+.honorarioTable col.colValor { width: 20%; }
+.honorarioTable col.colGerir { width: 10%; }
+.honorarioTable col.colParcelamento { width: 15%; }
+.honorarioTable col.colQuitacao { width: 15%; }
 
 .honorarioTable thead th {
   font-size: var(--text-xs);
@@ -102,6 +133,9 @@
   padding: var(--space-3) var(--space-4);
   font-size: var(--text-sm);
   border-bottom: 1px solid var(--color-outline-variant);
+  vertical-align: top;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
 }
 
 .honorarioTable tbody tr:last-child td {

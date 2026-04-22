@@ -86,6 +86,11 @@
   text-decoration: underline;
 }
 
+/* Mobile list oculto no desktop */
+.mobileList {
+  display: none;
+}
+
 /* ─── Mobile ─── */
 @media (max-width: 768px) {
   .pageTitle {

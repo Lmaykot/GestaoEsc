@@ -72,7 +72,7 @@ export interface Relatorio {
   clientes_extras: Cliente[]
 }
 
-export type HonorarioTipo = 'inicial' | 'condicionado' | 'intermediario' | 'exito' | 'mensais'
+export type HonorarioTipo = 'inicial' | 'condicionado' | 'intermediario' | 'exito' | 'mensais' | 'hora'
 
 export const TIPO_LABELS: Record<string, string> = {
   inicial: 'Honorários Iniciais',
@@ -80,9 +80,10 @@ export const TIPO_LABELS: Record<string, string> = {
   intermediario: 'Honorários Intermediários',
   exito: 'Honorários de Êxito',
   mensais: 'Honorários Mensais',
+  hora: 'Honorários por Hora Trabalhada',
 }
 
-export const TIPO_ORDER: HonorarioTipo[] = ['inicial', 'condicionado', 'intermediario', 'exito', 'mensais']
+export const TIPO_ORDER: HonorarioTipo[] = ['inicial', 'condicionado', 'intermediario', 'exito', 'mensais', 'hora']
 
 export const CONTRATO_TIPOS = ['Contencioso', 'Consultoria', 'Licenciamento', 'Misto']
 export const CONTRATO_STATUS = ['Ativo', 'Encerrado', 'Quitado']

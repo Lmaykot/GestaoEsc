@@ -157,6 +157,8 @@ export function CadastroContrato() {
     { key: 'status', header: 'Status', width: '100px', render: (r) => <StatusChip status={r.status} /> },
   ]
 
+  const isEmpty = selectedId === null && !form.ctt_n
+
   return (
     <div>
       <h1 className={styles.pageTitle}>Cadastro de Contratos</h1>
@@ -183,6 +185,12 @@ export function CadastroContrato() {
         </div>
 
         <Card className={styles.formPanel}>
+          {isEmpty ? (
+            <div className={styles.emptyState}>
+              Selecione um contrato existente ou clique em <strong>Novo Contrato</strong>
+            </div>
+          ) : (
+            <>
           <div className={styles.section}>
             <SectionHeader text="Dados do Contrato" />
             <div className={styles.formGrid}>
@@ -319,6 +327,8 @@ export function CadastroContrato() {
               {saving ? 'Salvando...' : 'Salvar e Avançar'}
             </Button>
           </div>
+            </>
+          )}
         </Card>
       </div>
 
