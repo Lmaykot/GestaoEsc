@@ -10,6 +10,7 @@ const NAV_ITEMS = [
   { to: '/pagamentos', icon: '💳', label: 'Pagamentos' },
   { to: '/relatorio', icon: '📊', label: 'Relatório' },
   { to: '/inadimplentes', icon: '⚠️', label: 'Inadimplentes' },
+  { to: '/export', icon: '💾', label: 'Exportação' },
 ]
 
 const MOBILE_NAV_ITEMS = [
@@ -17,6 +18,7 @@ const MOBILE_NAV_ITEMS = [
   { to: '/pagamentos', icon: '💳', label: 'Pagamentos' },
   { to: '/relatorio', icon: '📊', label: 'Relatório' },
   { to: '/inadimplentes', icon: '⚠️', label: 'Inadimpl.' },
+  { to: '/export', icon: '💾', label: 'Export.' },
 ]
 
 interface AppShellProps {
